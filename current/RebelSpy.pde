@@ -1277,7 +1277,7 @@ uint32_t TimerOverFlow(uint32_t currentTime)
 //-----------------------------------------------------------------------------
 void program_freq0(long frequency)
 {
-    AD9834_reset_high();  
+    //AD9834_reset_high();  
     int flow,fhigh;
     fcalc = frequency*(268.435456e6 / Reference );    // 2^28 =
     flow = fcalc&0x3fff;              //  49.99975mhz  
@@ -1286,13 +1286,13 @@ void program_freq0(long frequency)
     clock_data_to_ad9834(flow|AD9834_FREQ0_REGISTER_SELECT_BIT);
     clock_data_to_ad9834(fhigh|AD9834_FREQ0_REGISTER_SELECT_BIT);
     digitalWrite(FSYNC_BIT, HIGH);
-    AD9834_reset_low();
+    //AD9834_reset_low();
 }    // end   program_freq0
 
 //|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  
 void program_freq1(long frequency)
 {
-    AD9834_reset_high(); 
+    //AD9834_reset_high(); 
     int flow,fhigh;
     fcalc = frequency*(268.435456e6 / Reference );    // 2^28 =
     flow = fcalc&0x3fff;              //  use for 49.99975mhz   
@@ -1301,7 +1301,7 @@ void program_freq1(long frequency)
     clock_data_to_ad9834(flow|AD9834_FREQ1_REGISTER_SELECT_BIT);
     clock_data_to_ad9834(fhigh|AD9834_FREQ1_REGISTER_SELECT_BIT);
     digitalWrite(FSYNC_BIT, HIGH);  
-    AD9834_reset_low();
+    //AD9834_reset_low();
 }  
 
 //------------------------------------------------------------------------------

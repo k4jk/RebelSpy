@@ -498,20 +498,6 @@ void loop()     //
     {
         serialDump();    // comment this out to remove the one second tick
     }
-    
-   //Temp freq announce test
-   
-       //float TX_frequency = (frequency + IF)/100;
-       //      char buffer[8];
-       //      ltoa(TX_frequency, buffer, 10);
-       //      announce(buffer);
-   
-  // delay (5000);
-   //-----------------
-    
-    
-
-
 
 }    //  END LOOP
 //===================================================================

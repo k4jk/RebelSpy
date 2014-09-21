@@ -44,125 +44,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   Reset goes high to set the internal reg to 0 and sets the output to midscale.
   Reset is then taken low to enable output. 
  ***************************************************   
- Notes: 11/29/2012  this works.     
-        12/07/2012  TX and RX working.
-        02/21/2013  Dual band and some other stuff working
- 
-  Need to add 100/1khz/10khz flash and the band edge stop to an led.
-  DONE: LED to stay lit at band edges.
-  Add RIT routine limits.
-  RIT range +/- 500 hz. This is subject to change! Top center of RIT pot 
-  will have a dead band area of around 24. Analog ADC 1024 -24 = 1000/2 = 500 
-  DONE: Add Band stop limits. 40m ( 7.000 > 7.300 ), 20m ( 14.000 > 14.350 )
-  Main tuning steps 100 hz ( DEFAULT ).
-  Default to the calling frequency of 40m and 20m. 40 ( 7.030 ), 20m ( 14.060 )
-  Comment out the lcd routine later used for eval.
-  This is real basic code to get things working. 
-  Lets add the LCD Routine to show the Ref freq and the output freq
- *****************************************************************
-  * LCD RS pin to digital pin 26
-  * LCD Enable pin to digital pin 27
-  * LCD D4 pin to digital pin 28
-  * LCD D5 pin to digital pin 29
-  * LCD D6 pin to digital pin 30
-  * LCD D7 pin to digital pin 31
-  * LCD R/W pin to ground
-  * 10K resistor:
-  * ends to +5V and ground
-  * wiper to LCD VO pin (pin 3)    analogWrite(Side_Tone, 127);
- *****************************************************************
-  Ideas on the Function and Select buttons.
-  DONE: FUNCTION button steps from BW ( green ) to STEP ( yellow ) to OTHER (red ).
-    SELECT button steps from in 
-    BW ( <Wide, green>, <Medium, yellow>, <Narrow, red> ).
-    STEP ( <100 hz, green, <1Khz, yellow>, 10Khz, red> ).
-    OTHER ( < , >, < , >, < , > ) OTHER has yet to be defined
-
-  Default Band_width will be wide ( Green led light ).
-  When pressing the function button one of three leds will light. 
-  as explained above the select button will choose which setting will be used. 
-  The Orange led in the Ten-Tec logo will flash to each step the STEP is set 
-  too when tuning.  As it will also turn on when at the BAND edges.  
-  Default frequency on power up will be the calling frequency of either the 
-  40 meter or 20 meter band. Which is selected by the band shorting block. 
-  Pins shorted 40M
-  Calling Frequency for 40 meters is 7.030 mhz.
-  Calling Frequency for 20 meters is 14.060 mhz.
-  I.F. Frequency used is 9.0 mhz.
-  DDS Range is: 
-  40 meters will use HI side injection.
-  9(I.F.) + 7(40m) = 16mhz.  9(I.F.) + 7.30 = 16.3 mhz.
-  20 meters will use LO side injection.
-  14(20m) - 9(I.F.) = 5mhz.  14.350(20m) - 9(I.F.) = 5.35 mhz.
-
-  The Headphone jack can supply a headphone or speaker. The header pins(2) 
-  if shorted will drive a speaker.
-  Unshorted inserts 100 ohm resistors in series with the headphone to limit 
-  the level to the headphones.
-
-  The RIT knob will be at 0 offset in the Top Dead Center position. And will 
-  go about -500 hz to +500 hz when turned to either extreme. Total range 
-  about +/- 500 hz. This may change!
-
-  The band jumpers should be relocated when changing bans the TX low pass are 
-  to one side or the other.  And the Receive filters are the same.
-  made so changes to the BW control lines. need to rewrite so BW will 
-  cycle according to the Function/Select idea.
-
-  Added the Band_Stop and Flash led to the Schematic, need to write code to 
-  reflect this.
-
-  Thinking about using switch/case routines for the Function/Select. Also the 
-  previous settings from BW/STEP/OTHER should be remembered when cycling 
-  through the Function/Select routine. If any of this makes sense!
-
-  As the code looks now I have more than likely left out several items!
-  RIT is missing. Flash/Band edge is missing. Function/Select is missing. Etc.
-  Need to update lcd only when encoder moved or buttons are pressed.
-  
-  March 19, 2013 got the function/select routines working. Now to copy the 
-  code to this main program and get everything integrated. Whew!!!!
-  
-  March 20, 2013. First day of Spring. Got the function/select routines 
-  integrated into program! Works!  Had to tweak on the delays a bit.  Still 
-  need to tackle the DDS failure to come on without the encoder having to be 
-  turned.
-  Also need to get a routine that saves the current settings when powered down. 
-  The list goes on and on!
-
-  April 07, 2013. (AC7FK) Added serialDump routine to send information to host
-  via the serial port (115200 bps).  The serialDump function is called once 
-  per second.  Added calculation for loops per second and loop execution time.  
-  Commented out the splash_RX_freq() function call to reduce execution time of 
-  the main loop.  Simplified IF frequency math by changing the sign of the IF
-  based on the selected band at boot time.  General cleanup of whitespace
-  and comments.
-  
-  
-  April 11, 2013. (WA4CDM) Got the band edge led and frequency stops working.
-  The Rebel will not operate out of Band now on RX or TX.
-  Also got the RIT control separated from the TX frequency register.
-  The Step_Flash routine works. Whenever the encoder is turned the led will flash.
-  This will help to calculate the operating frequency when in 100 hz, 1khz or 10khz.
-  
-  April 23, 2013. Rit was looked into to remove the scratchy sound when Rit pot
-  was turned. See the "void UpdateFreq(long freq)" routine.
-  
-  April 26, 2013. Modified Setup so the TX_OUT (Default_Settings) will be set to
-  zero on power up. And set Band_End_Flash_led to zero.
-  
-  The pwm (Side_Tone 3) call was removed and that port was made to be a logic level.
-  It will be used to provide an on/off signal for the hardware sidetone osc.
-  
-  May 1, 2013. (WA4CDM) Swapped the key lines in software. 
-   TX_Dah  32    now  33
-   TX_Dit  33    now  32
-  
-  May 15, 2013. (WA4CDM) This Rev(01) for posting on Yahoo users group.
-  
-  Release Date to Production 7/15/2013
-*/
-
 
 /* September 15, 2013. (K4JK) Added simple IAMBIC keyer. Code adapted from openqrp.org.
   Speed can be changed by changing the argument to the loadWPM() function in setup().
@@ -238,6 +119,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define  Other_2_user                       1           //
 #define  Other_3_user                       2           //
 
+#define     N_MORSE  (sizeof(morsetab)/sizeof(morsetab[0]))    // Morse Table
+#define     DOTLEN   (1200/CW_SPEED)                           // No. milliseconds per dit
+#define     DASHLEN  (3*(1200/CW_SPEED))                       // CW weight  3.5 / 1   !! was 3.5*
+
 
 
 const int RitReadPin        = A0;  // pin that the sensor is attached to used for a rit routine later.
@@ -259,6 +144,52 @@ int CodeReadValue           = 0;
 const int CWSpeedReadPin    = A7;  // To adjust CW speed for user written keyer.
 int CWSpeedReadValue        = 0;            
 
+int CW_SPEED = 18;
+
+// Morse table
+struct t_mtab { char c, pat; } ;
+struct t_mtab morsetab[] = {
+  	{'.', 106},
+	{',', 115},
+	{'?', 76},
+	{'/', 41},
+	{'A', 6},
+	{'B', 17},
+	{'C', 21},
+	{'D', 9},
+	{'E', 2},
+	{'F', 20},
+	{'G', 11},
+	{'H', 16},
+	{'I', 4},
+	{'J', 30},
+	{'K', 13},
+	{'L', 18},
+	{'M', 7},
+	{'N', 5},
+	{'O', 15},
+	{'P', 22},
+	{'Q', 27},
+	{'R', 10},
+	{'S', 8},
+	{'T', 3},
+	{'U', 12},
+	{'V', 24},
+	{'W', 14},
+	{'X', 25},
+	{'Y', 29},
+	{'Z', 19},
+	{'1', 62},
+	{'2', 60},
+	{'3', 56},
+	{'4', 48},
+	{'5', 32},
+	{'6', 33},
+	{'7', 35},
+	{'8', 39},
+	{'9', 47},
+	{'0', 63}
+} ;
 
 
 
@@ -309,6 +240,13 @@ int val;
 int encoder0Pos                 = 0;
 int encoder0PinALast            = LOW;
 int n                           = LOW;
+
+//##################USER SETUP STUFF################################
+
+//Keyer Weighting 
+float KeyerWeight = 3.5;     // Sets dah to dit weighting, 3 or 4 should be good. Leaving 3.5 as default.
+int LENGTH;                  // Length for freq announce
+
 
 //------------------------------------------------------------
 const long meter_40             = 16.03e6;      // IF + Band frequency, 
@@ -495,6 +433,7 @@ void setup()
       ST_key = 1;      //If so, enter straight key mode
     }
 
+
 }   //    end of setup
 
 
@@ -559,6 +498,20 @@ void loop()     //
     {
         serialDump();    // comment this out to remove the one second tick
     }
+    
+   //Temp freq announce test
+   
+       //float TX_frequency = (frequency + IF)/100;
+       //      char buffer[8];
+       //      ltoa(TX_frequency, buffer, 10);
+       //      announce(buffer);
+   
+  // delay (5000);
+   //-----------------
+    
+    
+
+
 
 }    //  END LOOP
 //===================================================================
@@ -748,7 +701,7 @@ void TX_routine()
     case CHK_DAH:
         // See if dah paddle was pressed
         if (keyerControl & DAH_L) {
-            ktimer = ditTime*3;
+            ktimer = ditTime * KeyerWeight;
             keyerState = KEYED_PREP;
         }
         else {
@@ -819,7 +772,8 @@ void update_PaddleLatch()
         keyerControl |= DAH_L;
     }
 }
- 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    Calculate new time constants based on wpm value
@@ -829,6 +783,7 @@ void update_PaddleLatch()
 void loadWPM (int wpm)
 {
     ditTime = 1200/wpm;
+    CW_SPEED = wpm;
 }
 
 void checkWPM() //Checks the Keyer speed Pot and updates value
@@ -837,6 +792,40 @@ void checkWPM() //Checks the Keyer speed Pot and updates value
    CWSpeedReadValue = map(CWSpeedReadValue, 0, 1024, 5, 45);
    loadWPM(CWSpeedReadValue);
 }
+
+//Frequency Announce-----------------
+
+
+void announce(char *str) {
+  while (*str) 
+    key_announce(*str++); 
+}
+void beep(int LENGTH) {
+    digitalWrite(Side_Tone, HIGH);
+    delay(LENGTH);
+    digitalWrite(Side_Tone, LOW);
+    delay(DOTLEN) ;
+}
+
+void key_announce(char c) {
+  for (int i=0; i<N_MORSE; i++) {
+    if (morsetab[i].c == c) {
+      unsigned char p = morsetab[i].pat ;
+      while (p != 1) {
+          if (p & 1)
+            beep(DASHLEN) ;
+          else
+            beep(DOTLEN) ;
+          p = p / 2 ;
+          }
+      delay(2*DOTLEN) ;
+      return ;
+      }
+  }
+}
+
+
+
 
 //----------------------------------------------------------------------------
 void RIT_Read()
@@ -1066,8 +1055,34 @@ void  Selection()
     Step_Select_Button = digitalRead(Select_Button);
     if (Step_Select_Button == HIGH) 
     {   
-       while( digitalRead(Select_Button) == HIGH ){ }  // added for testing
-        for (int i=0; i <= 150e3; i++); // short delay
+       // Debounce start
+       unsigned long time;
+       unsigned long start_time;
+         unsigned long long_time;
+         long_time = millis();
+       
+       time = millis();
+       while( digitalRead(Select_Button) == HIGH ){ 
+         
+           // function button is pressed longer then 2 seconds
+           if ( (millis() - long_time) > 2000 && (millis() - long_time) < 2010 ) { 
+             // announce frequency
+             int TX_frequency = (frequency + IF)/100;
+             char buffer[8];
+             ltoa(TX_frequency, buffer, 10);
+             announce(buffer);
+        
+             // wait for button release
+             while( digitalRead(Select_Button) == HIGH ){ 
+             }   
+             return;        
+           } 
+
+         start_time = time;
+         while( (time - start_time) < 7) {
+           time = millis();
+         }
+       } // Debounce end
 
         Step_Select_Button1 = Step_Select_Button1++;
         if (Step_Select_Button1 > 2 ) 

@@ -120,8 +120,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define  Other_3_user                       2           //
 
 #define     N_MORSE  (sizeof(morsetab)/sizeof(morsetab[0]))    // Morse Table
-#define     DOTLEN   (1200/CW_SPEED)                           // No. milliseconds per dit
-#define     DASHLEN  (3*(1200/CW_SPEED))                       // CW weight  3.5 / 1   !! was 3.5*
+//#define     DOTLEN   (1200/CW_SPEED)                           // No. milliseconds per dit
+//#define     DASHLEN  (3*(1200/CW_SPEED))                       // CW weight  3.5 / 1   !! was 3.5*
 
 
 
@@ -144,7 +144,7 @@ int CodeReadValue           = 0;
 const int CWSpeedReadPin    = A7;  // To adjust CW speed for user written keyer.
 int CWSpeedReadValue        = 0;            
 
-int CW_SPEED = 18;
+//int CW_SPEED = 18;
 
 // Morse table
 struct t_mtab { char c, pat; } ;
@@ -274,6 +274,7 @@ long IF                         = 9.00e6;          //  I.F. Frequency
 unsigned long       ditTime;                    // No. milliseconds per dit
 unsigned char       keyerControl;
 unsigned char       keyerState;
+
   
 enum KSTYPE {IDLE, CHK_DIT, CHK_DAH, KEYED_PREP, KEYED, INTER_ELEMENT };
 
@@ -434,7 +435,9 @@ void setup()
     }
 
 
-}   //    end of setup
+}   
+
+//    end of setup
 
 
 
@@ -769,7 +772,7 @@ void update_PaddleLatch()
 void loadWPM (int wpm)
 {
     ditTime = 1200/wpm;
-    CW_SPEED = wpm;
+   // CW_SPEED = wpm;
 }
 
 void checkWPM() //Checks the Keyer speed Pot and updates value
@@ -790,7 +793,7 @@ void beep(int LENGTH) {
     digitalWrite(Side_Tone, HIGH);
     delay(LENGTH);
     digitalWrite(Side_Tone, LOW);
-    delay(DOTLEN) ;
+    delay(ditTime) ;
 }
 
 void key_announce(char c) {
@@ -799,12 +802,12 @@ void key_announce(char c) {
       unsigned char p = morsetab[i].pat ;
       while (p != 1) {
           if (p & 1)
-            beep(DASHLEN) ;
+            beep((KeyerWeight * (ditTime * 1.1))) ;
           else
-            beep(DOTLEN) ;
+            beep((ditTime * 1.1)) ;
           p = p / 2 ;
           }
-      delay(2*DOTLEN) ;
+      delay(3*ditTime) ;
       return ;
       }
   }

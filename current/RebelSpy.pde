@@ -238,7 +238,7 @@ const int encoder0PinB          = 6;
 
 int val; 
 int encoder0Pos                 = 0;
-int encoder0PinALast            = LOW;
+int encoder0PinALast            = LOW; 
 int n                           = LOW;
 
 //##################USER SETUP STUFF################################
@@ -366,7 +366,8 @@ void setup()
     //---------------  Encoder ------------------------------------
     pinMode (encoder0PinA,          INPUT);     // using optical for now
     pinMode (encoder0PinB,          INPUT);     // using optical for now 
-
+    digitalWrite(encoder0PinA,      HIGH);      //Pullup 
+    digitalWrite(encoder0PinB,      HIGH);      //Pullup
     //--------------------------------------------------------------
     pinMode (TX_Dit,                INPUT);     // Dit Key line 
     pinMode (TX_Dah,                INPUT);     // Dah Key line
@@ -410,6 +411,8 @@ void setup()
 
     digitalWrite(TX_OUT,            LOW);       // turn off TX
 
+
+
     //--------------------------------------------------------------
     Step_Size_100();   // Change for other Step_Size default!
     for (int i=0; i <= 5e4; i++);  // small delay
@@ -417,7 +420,7 @@ void setup()
     AD9834_init();
     AD9834_reset();
 
-    //encoder0PinALast = digitalRead(encoder0PinA);
+    encoder0PinALast = digitalRead(encoder0PinA);    //This initializes the endoder status so it isn't random at power on
     //attachInterrupt(encoder0PinA, Encoder, CHANGE);
     //attachInterrupt(encoder0PinB, Encoder, CHANGE);
     attachCoreTimerService(TimerOverFlow);//See function at the bottom of the file.
@@ -434,8 +437,9 @@ void setup()
       ST_key = 1;      //If so, enter straight key mode
     }
 
-
 }   
+
+
 
 //    end of setup
 
@@ -558,8 +562,8 @@ void Band_Set_40_20M()
 
 //--------------------------- Encoder Routine ----------------------------  
 void Encoder()
-{  
-    n = digitalRead(encoder0PinA);
+{    
+  n = digitalRead(encoder0PinA);
     if ((encoder0PinALast == LOW) && (n == HIGH)) 
     {
         if (digitalRead(encoder0PinB) == LOW) 
@@ -1056,9 +1060,9 @@ void  Selection()
            // function button is pressed longer then 2 seconds
            if ( (millis() - long_time) > 2000 && (millis() - long_time) < 2010 ) { 
              // announce frequency
-             int TX_frequency = (frequency + IF)/100;
+             int ANN_frequency = (frequency + IF + RitFreqOffset)/100;
              char buffer[8];
-             ltoa(TX_frequency, buffer, 10);
+             ltoa(ANN_frequency, buffer, 10);
              announce(buffer);
         
              // wait for button release

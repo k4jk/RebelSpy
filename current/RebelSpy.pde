@@ -1060,7 +1060,7 @@ void  Selection()
            // function button is pressed longer then 2 seconds
            if ( (millis() - long_time) > 2000 && (millis() - long_time) < 2010 ) { 
              // announce frequency
-             int ANN_frequency = (frequency + IF + RitFreqOffset)/100;
+             int ANN_frequency = (frequency + IF)/100;
              char buffer[8];
              ltoa(ANN_frequency, buffer, 10);
              announce(buffer);
